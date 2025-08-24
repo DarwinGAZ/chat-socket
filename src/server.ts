@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import http from "http";
-import { Server as socketIO } from "socket.io";
+import { Server as socketIO, Socket } from "socket.io";
 
 const app = express();
 const server = http.createServer(app);
@@ -14,10 +14,16 @@ server.listen(3000, () => {
 
 app.use(express.static(path.join(__dirname, "../public")));
 
+let connectedUsers: string[] = [];
+
 io.on("connection", (socket) => {
     console.log("New client connected...");
 
-    socket.on("disconnect", () => {
-        console.log("Client disconnected...");
+    socket.on("join-request", (username: string) => {
+        socket.data.username = username;
+        connectedUsers.push(username);
+        console.log(connectedUsers);
+
+        socket.emit("user-ok", connectedUsers);
     });
 });
