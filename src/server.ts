@@ -25,5 +25,31 @@ io.on("connection", (socket) => {
         console.log(connectedUsers);
 
         socket.emit("user-ok", connectedUsers);
+
+        socket.broadcast.emit("list-update", {
+            joined: username,
+            list: connectedUsers,
+        });
+
+        socket.on("disconnect", () => {
+            connectedUsers = connectedUsers.filter(
+                (u) => u != socket.data.username
+            );
+            console.log(connectedUsers);
+
+            socket.broadcast.emit("list-update", {
+                left: socket.data.username,
+                list: connectedUsers,
+            });
+        });
+    });
+
+    socket.on("send-msg", (txt: string) => {
+        let obj = {
+            username: socket.data.username,
+            message: txt,
+        };
+
+        socket.broadcast.emit("show-msg", obj);
     });
 });
