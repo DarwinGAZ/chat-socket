@@ -8,11 +8,11 @@ const server = http.createServer(app);
 
 const io = new socketIO(server);
 
-server.listen(3000, () => {
-    console.log("Server is running on http://localhost:3000");
-});
-
 app.use(express.static(path.join(__dirname, "../public")));
+
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
 let connectedUsers: string[] = [];
 
@@ -52,4 +52,8 @@ io.on("connection", (socket) => {
 
         socket.broadcast.emit("show-msg", obj);
     });
+});
+
+server.listen(3000, () => {
+    console.log("Server is running on http://localhost:3000");
 });
